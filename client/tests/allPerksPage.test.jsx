@@ -21,20 +21,20 @@ describe('AllPerks page (Directory)', () => {
       { initialEntries: ['/explore'] }
     );
 
-    // Wait for the baseline card to appear which guarantees the asynchronous
-    // fetch finished.
+    // Wait for loading to complete
     await waitFor(() => {
-      expect(screen.getByText(seededPerk.title)).toBeInTheDocument();
-    });
+      expect(screen.queryByText(/loading perks/i)).not.toBeInTheDocument();
+    }, { timeout: 10000 });
 
     // Interact with the name filter input using the real value that
     // corresponds to the seeded record.
     const nameFilter = screen.getByPlaceholderText('Enter perk name...');
     fireEvent.change(nameFilter, { target: { value: seededPerk.title } });
 
+    // Wait for the filter to take effect and the seeded perk to appear
     await waitFor(() => {
       expect(screen.getByText(seededPerk.title)).toBeInTheDocument();
-    });
+    }, { timeout: 10000 });
 
     // The summary text should continue to reflect the number of matching perks.
     expect(screen.getByText(/showing/i)).toHaveTextContent('Showing');
@@ -51,7 +51,34 @@ describe('AllPerks page (Directory)', () => {
   */
 
   test('lists public perks and responds to merchant filtering', async () => {
-    // This will always fail until the TODO above is implemented.
-    expect(true).toBe(false);
+    // The seeded record gives us a deterministic expectation regardless of the
+    // rest of the shared database contents.
+    const seededPerk = global.__TEST_CONTEXT__.seededPerk;
+
+    // Render the exploration page so it performs its real HTTP fetch.
+    renderWithRouter(
+      <Routes>
+        <Route path="/explore" element={<AllPerks />} />
+      </Routes>,
+      { initialEntries: ['/explore'] }
+    );
+
+    // Wait for loading to complete
+    await waitFor(() => {
+      expect(screen.queryByText(/loading perks/i)).not.toBeInTheDocument();
+    }, { timeout: 10000 });
+
+    // Interact with the merchant filter dropdown using the real value that
+    // corresponds to the seeded record.
+    const merchantFilter = screen.getByRole('combobox');
+    fireEvent.change(merchantFilter, { target: { value: seededPerk.merchant } });
+
+    // Wait for the filter to take effect and the seeded perk to appear
+    await waitFor(() => {
+      expect(screen.getByText(seededPerk.title)).toBeInTheDocument();
+    }, { timeout: 10000 });
+
+    // The summary text should continue to reflect the number of matching perks.
+    expect(screen.getByText(/showing/i)).toHaveTextContent('Showing');
   });
 });

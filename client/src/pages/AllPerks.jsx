@@ -155,6 +155,7 @@ export default function AllPerks() {
                 type="text"
                 className="input"
                 placeholder="Enter perk name..."
+                value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
               />
               <p className="text-xs text-zinc-500 mt-1">
@@ -170,6 +171,7 @@ export default function AllPerks() {
               </label>
               <select
                 className="input"
+                value={merchantFilter}
                 onChange={e => setMerchantFilter(e.target.value)}
               >
                 <option value="">All Merchants</option>
